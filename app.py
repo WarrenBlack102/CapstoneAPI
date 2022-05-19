@@ -14,7 +14,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "ap
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
-class Item(db.Model):
+class Surfboard(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.String, nullable=False)
     type = db.Column(db.String)
@@ -27,16 +27,16 @@ class Item(db.Model):
 
 #SCHEMAS---------------------------------------------------SCHEMAS
 
-class ItemSchema(ma.Schema):
+class SurfboardSchema(ma.Schema):
     class Meta:
         fields = ('id', 'name', 'type', 'item_img')
 
-item_schema = ItemSchema()
-multi_item_schema = ItemSchema(many=True)
+surfboard_schema = SurfboardSchema()
+multi_surfboard_schema = SurfboardSchema(many=True)
 
 #POSTS-------------------------------------------------------POSTS
 
-@app.route('/item/add', methods=["POST"])
+@app.route('/surfboard/add', methods=["POST"])
 def add_item():
     if request.content_type != 'application/json':
         return jsonify('Error: must be JSON')
@@ -51,15 +51,15 @@ def add_item():
     if item_img == None:
         return jsonify("Error: missing picture")
 
-    new_record = Item(name, type, item_img)
+    new_record = Surfboard(name, type, item_img)
     db.session.add(new_record)
     db.session.commit()
 
-    return jsonify(item_schema.dump(new_record))
+    return jsonify(surfboard_schema.dump(new_record))
 
 
-@app.route('/item/add/multi', methods=["POST"])
-def add_multi_items():
+@app.route('/surfboard/add/multi', methods=["POST"])
+def add_multi_surfboard():
     if request.content_type != "application/json":
         return jsonify("ERROR: must be JSON")
     
@@ -67,40 +67,40 @@ def add_multi_items():
 
     new_records = []
 
-    for item in post_data:
-        name = item.get('name')
-        type = item.get('type')
-        item_img = item.get('item_img')
+    for surfboard in post_data:
+        name = surfboard.get('name')
+        type = surfboard.get('type')
+        item_img = surfboard.get('item_img')
 
-        existing_item_check = db.session.query(Item).filter(item.name == name).first()
-        if existing_item_check is None:
-            new_record = item(name, type, item_img)
+        existing_surfboard_check = db.session.query(Surfboard).filter(surfboard.name == name).first()
+        if existing_surfboard_check is None:
+            new_record = surfboard(name, type, item_img)
             db.session.add(new_record)
             db.session.commit()
             new_records.append(new_record)
 
-        return jsonify(multi_item_schema.dump(new_records))
+        return jsonify(multi_surfboard_schema.dump(new_records))
 
 
 #GETS-----------------------------------------------------------------------------GETS
 
-@app.route('/item/get', methods=["GET"])
-def get_all_items():
-    all_records = db.session.query(Item).all()
-    return jsonify(multi_item_schema.dump(all_records))
+@app.route('/surfboard/get', methods=["GET"])
+def get_all_surfboard():
+    all_records = db.session.query(Surfboard).all()
+    return jsonify(multi_surfboard_schema.dump(all_records))
 
 
 
 
-@app.route('/item/get/<id>', methods=["GET"])
-def get_item_id(id):
-    one_item = db.session.query(Item).filter(Item.id == id).first()
-    return jsonify(item_schema.dump(one_item))
+@app.route('/surfboard/get/<id>', methods=["GET"])
+def get_surfboard_id(id):
+    one_surfboard= db.session.query(Surfboard).filter(Surfboard.id == id).first()
+    return jsonify(surfboard_schema.dump(one_surfboard))
 
 
 #PUT---------------------------------------------------------------------------PUT
-@app.route('/item/update/<id>', methods=["PUT"])
-def update_item(id):
+@app.route('/surfboard/update/<id>', methods=["PUT"])
+def update_surfboard(id):
     if request.content_type != 'application/json':
         return jsonify("Error: must be JSON")
 
@@ -109,28 +109,29 @@ def update_item(id):
     type = put_data.get('type')
     item_img = put_data.get('item_img')
 
-    item_to_update = db.session.query(Item).filter(Item.id == id).first()
+    surfboard_to_update = db.session.query(Surfboard).filter(Surfboard.id == id).first()
 
     if name != None:
-        item_to_update.name = name
+        surfboard_to_update.name = name
     if type != None:
-        item_to_update.type = type
+        surfboard_to_update.type = type
     if item_img != None:
-        item_to_update.item_img = item_img
+        surfboard_to_update.item_img = item_img
 
     db.session.commit()
 
-    return jsonify(item_schema.dump(item_to_update))
+    return jsonify(surfboard_schema.dump(surfboard_to_update))
 
 
 #DELETE------------------------------------------------------------------DELETE
 
-@app.route('/item/delete/<id>', methods=["DELETE"])
-def item_to_delete(id):
-    delete_item = db.session.query(Item).filter(Item.id == id).first()
-    db.session.delete(delete_item)
+@app.route('/surfboard/delete/<id>', methods=["DELETE"])
+def surfboard_to_delete(id):
+    delete_surfboard = db.session.query(Surfboard).filter(Surfboard.id == id).first()
+    db.session.delete(delete_surfboard)
     db.session.commit()
     return jsonify("Deleted Successfully")
+
 
 
 
