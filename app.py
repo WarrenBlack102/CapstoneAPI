@@ -7,8 +7,8 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "app.sqlite")
+#basedir = os.path.abspath(os.path.dirname(__file__))
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://ppxwlwmezjrlbd:86c43d53b0d52918556d627900d584f1ac8b1e00db95f1279f146c1a831f3965@ec2-34-230-153-41.compute-1.amazonaws.com:5432/d3o8uqsrg761b7"
 
 
 db = SQLAlchemy(app)
